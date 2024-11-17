@@ -25,10 +25,19 @@ func (q *PriorityQueue[T]) Enqueue(priority int, value T) {
 		return
 	}
 
-	node.next = q.root
+	pointer := q.root
 
-	q.root = node
+	for pointer.next != nil {
+		if pointer.priority >= priority {
+			node.next = pointer.next
+			pointer.next = node
+			return
+		}
 
+		pointer = pointer.next
+	}
+
+	pointer.next = node
 }
 
 func (q *PriorityQueue[T]) Dequeue() T {
@@ -37,16 +46,8 @@ func (q *PriorityQueue[T]) Dequeue() T {
 		return result
 	}
 
-	prev := &NodeQueue[T]{}
-	head := q.root
-	for head.next != nil {
-		prev = head
-		head = head.next
-	}
-
-	result = head.value
-	prev.next = nil
-	head = prev
+	result = q.root.value
+	q.root = q.root.next
 
 	return result
 }
